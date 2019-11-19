@@ -146,7 +146,7 @@ from matplotlib import pyplot as plt
 img = np.zeros( (512, 512, 3), np.uint8) + 255
 height, width, _ = img.shape
 offset = 40
-cv2.rectangle(img, (offset, offset), (height-offset, width-offset), 
+cv2.rectangle(img, (offset, offset), (width-offset, height-offset), 
               (55, 255, 255), 5)
 
 b, g, r = cv2.split(img)
@@ -178,7 +178,7 @@ from matplotlib import pyplot as plt
 img = np.zeros( (512, 512, 3), np.uint8) + 255
 height, width, _ = img.shape
 offset = 40
-cv2.circle(img, (height//2, width//2), (height+width)//4-offset, (55, 255, 255), 5)
+cv2.circle(img, (width//2, height//2), (width+height)//4-offset, (55, 255, 255), 5)
 
 b, g, r = cv2.split(img)
 img = cv2.merge([r, g, b])
@@ -258,13 +258,13 @@ dst = cv2.warpAffine(src, M, dsize[, dst[, flags[, borderMode[, borderValue]]]])
 
 **Parameters**
 
-- *src*	input image.
-- *dst*	output image that has the size dsize and the same type as src .
-- *M*	   $2×3$ transformation matrix.
-- *dsize*	size of the output image.
-- *flags*	combination of interpolation methods (see `InterpolationFlags`) and the optional flag `WARP_INVERSE_MAP`that means that M is the inverse transformation ( *dst*→*src* ).
-- *borderMode*	pixel extrapolation method (see `BorderTypes`); when `borderMode=BORDER_TRANSPARENT`, it means that the pixels in the destination image corresponding to the "outliers" in the source image are not modified by the function.
-  borderValue	value used in case of a constant border; by default, it is 0.
+- *src*: input image.
+- *dst*: output image that has the size dsize and the same type as src .
+- *M*: $2×3$ transformation matrix.
+- *dsize*: size of the output image.
+- *flags*: combination of interpolation methods (see `InterpolationFlags`) and the optional flag `WARP_INVERSE_MAP`that means that M is the inverse transformation ( *dst*→*src* ).
+- *borderMode*: pixel extrapolation method (see `BorderTypes`); when `borderMode=BORDER_TRANSPARENT`, it means that the pixels in the destination image corresponding to the "outliers" in the source image are not modified by the function.
+- *borderValue*: value used in case of a constant border; by default, it is 0.
 
 The function **warpAffine transforms** the source image using the specified matrix:
 $$
@@ -275,28 +275,37 @@ $$
 ```python
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
-img = cv2.imread('flower.jpg')
-H = np.float32([[1,0,100],[0,1,50]])
-rows,cols = img.shape[:2]
-res = cv2.warpAffine(img,H,(cols,rows)) #需要图像、变换矩阵、变换后的大小
+img = cv2.imread('data/lena.jpg')
+H = np.float32([[1, 0, 100], [0, 1, 50]])
+rows, cols = img.shape[:2]
+res = cv2.warpAffine(img,H,(cols,rows)) # 需要图像、变换矩阵、变换后的大小
+
 plt.subplot(121)
+b, g, r = cv2.split(img)
+img = cv2.merge([r, g, b])
 plt.imshow(img)
+plt.xticks([]), plt.yticks([])
+
 plt.subplot(122)
+b, g, r = cv2.split(res)
+res = cv2.merge([r, g, b])
 plt.imshow(res)
+plt.xticks([]), plt.yticks([])
+
 plt.show()
 ```
 
-![4](E:\machine_learning\opencv\4.png)
-
-
+![1574149017](graph/1574149017.png)
 
 ### （二）图像的扩大与缩小
 
-图像的扩大与缩小有专门的一个函数，**`cv2.resize()`**，那么关于伸缩需要确定的就是缩放比例，可以是x与y方向相同倍数，也可以单独设置x与y的缩放比例。另外一个就是在缩放以后图像必然就会变化，这就又涉及到一个插值问题。那么这个函数中，缩放有几种不同的插值（**`interpolation`**）方法，在缩小时推荐**`cv2.INTER_ARER`**,扩大是推荐**`cv2.INTER_CUBIC`**和**`cv2.INTER_LINEAR`**。默认都是**`cv2.INTER_LINEAR`**，比如：
+图像的扩大与缩小有专门的一个函数，`cv2.resize()`，那么关于伸缩需要确定的就是缩放比例，可以是$x$与$y$方向相同倍数，也可以单独设置$x$与$y$的缩放比例。另外一个就是在缩放以后图像必然就会变化，这就又涉及到一个插值问题。那么这个函数中，缩放有几种不同的插值（`interpolation`）方法，在缩小时推荐`cv2.INTER_ARER`,扩大是推荐`cv2.INTER_CUBIC`和`cv2.INTER_LINEAR`。默认都是`cv2.INTER_LINEAR`，比如：
 
- **`cv2.resize(src, dsize[, dst[, fx[, fy[, interpolation]]]]) → dst`** 
+```python
+ dst = cv2.resize(src, dsize[, dst[, fx[, fy[, interpolation]]]])
+```
 
 ```python
 import cv2
@@ -319,7 +328,7 @@ plt.imshow(res2)
 plt.show()
 ```
 
-![这里写图片描述](http://img.blog.csdn.net/20150708111354556)
+![1574149927](graph/1574149927.png)
 
 通过坐标轴可以看到图像扩大了一倍，并且两种方法相同。
 
@@ -344,11 +353,11 @@ $$
 \alpha=scale.cos(angle)\\
 \beta = scale.sin(angle)
 $$
-为了构造这个矩阵，opencv提供了一个函数： 
+为了构造这个矩阵，opencv提供了一个函数：` cv2.getRotationMatrix2D()`，这个函数需要三个参数，旋转中心，旋转角度，旋转后图像的缩放比例，
 
-**`cv2.getRotationMatrix2D()`**，这个函数需要三个参数，**`旋转中心`**，**`旋转角度`**，**`旋转后图像的缩放比例`**，
-
-**`cv2.getRotationMatrix2D(center, angle, scale) → retval`**
+```python
+retval = cv2.getRotationMatrix2D(center, angle, scale)
+```
 
 比如下例：
 
@@ -374,10 +383,15 @@ plt.imshow(res)
 
 ### 四）图像的仿射
 
-图像的**`旋转加上拉升`**就是图像仿射变换，仿射变化也是需要一个M矩阵就可以，但是由于仿射变换比较复杂，一般直接找很难找到这个矩阵，opencv提供了根据变换前后三个点的对应关系来自动求解M。这个函数是 
-**`M=cv2.getAffineTransform(pos1,pos2)`**,其中两个位置就是变换前后的对应位置关系。输 出的就是仿射矩阵M。然后在使用函数**`cv2.warpAffine()`**。形象化的图如下（引用参考的） 
+**图像的旋转加上拉升就是图像仿射变换**，仿射变化也是需要一个$M$矩阵就可以，但是由于仿射变换比较复杂，一般直接找很难找到这个矩阵，opencv提供了根据变换前后三个点的对应关系来自动求解$M$。这个函数是 
 
-![这里写图片描述](http://img.blog.csdn.net/20150708111543898)
+```python
+M=cv2.getAffineTransform(pos1,pos2)
+```
+
+其中两个位置就是变换前后的对应位置关系。输出的就是仿射矩阵$M$。然后在使用函数`cv2.warpAffine()`。形象化的图如下（引用参考的） 
+
+![这里写图片描述](graph/20150708111543898)
 
 一个例子比如：
 
@@ -403,14 +417,16 @@ plt.imshow(res)
 
 ###  （ 五）图像的透射
 
-透视需要的是一个3*3的矩阵，同理opencv在构造这个矩阵的时候还是采用一种点对应的关系来通过函数自己寻找的，因为我们自己很难计算出来。这个函数是**`M = cv2.getPerspectiveTransform(pts1,pts2)`**，
+透视需要的是一个$3\times 3$的矩阵，同理opencv在构造这个矩阵的时候还是采用一种点对应的关系来通过函数自己寻找的，因为我们自己很难计算出来。这个函数是
 
 ```python
-Calculates a perspective transform from four pairs of the corresponding points
+M = cv2.getPerspectiveTransform(pts1,pts2)
 ```
 
-其中pts需要变换前后的4个点对应位置。得到M后在通过函数cv2.warpPerspective(img,M,(200,200))进行。形象化的图如下（引用参考的） 
-![这里写图片描述](http://img.blog.csdn.net/20150708111655043) 
+> Calculates a perspective transform from four pairs of the corresponding points
+
+其中pts需要变换前后的$4$个点对应位置。得到$M$后在通过函数`cv2.warpPerspective(img,M,(200,200))`进行。形象化的图如下（引用参考的） 
+![这里写图片描述](graph/20150708111655043) 
 
 一个例子如下：
 
@@ -435,24 +451,26 @@ plt.imshow(res)
 
 ## opencv使用笔记（四）（图像的阈值处理）
 
-- 图像的阈值处理一般使得图像的像素值更单一、图像更简单。阈值可以分为全局性质的阈值，也可以分为局部性质的阈值，可以是单阈值的也可以是多阈值的。当然阈值越多是越复杂的。下面将介绍opencv下的三种阈值方法。
+图像的阈值处理一般使得图像的像素值更单一、图像更简单。阈值可以分为全局性质的阈值，也可以分为局部性质的阈值，可以是单阈值的也可以是多阈值的。当然阈值越多是越复杂的。下面将介绍opencv下的三种阈值方法。
 
 ###  （ 一）简单阈值
 
-简单阈值当然是最简单，选取一个全局阈值，然后就把整幅图像分成了非黑即白的二值图像了。函数为**`cv2.threshold()`** 
+简单阈值当然是最简单，选取一个全局阈值，然后就把整幅图像分成了非黑即白的二值图像了。函数为`cv2.threshold() `
 这个函数有四个参数，第一个原图像，第二个进行分类的阈值，第三个是高于（低于）阈值时赋予的新值，第四个是一个方法选择参数，常用的有： 
-• **`cv2.THRESH_BINARY`**（黑白二值） 
-• **`cv2.THRESH_BINARY_INV`**（黑白二值反转） 
-• **`cv2.THRESH_TRUNC`** （得到的图像为多像素值） 
-• **`cv2.THRESH_TOZERO`** 
-• **`cv2.THRESH_TOZERO_INV`** 
-该函数有两个返回值，第一个**`retVal`**（得到的阈值值（在后面一个方法中会用到）），第二个就是阈值化后的图像。 
 
- **threshold**
+- `cv2.THRESH_BINARY`（黑白二值） 
+- `cv2.THRESH_BINARY_INV`（黑白二值反转） 
+-  `cv2.THRESH_TRUNC` （得到的图像为多像素值） 
+-  `cv2.THRESH_TOZERO` 
+- `cv2.THRESH_TOZERO_INV` 
+
+该函数有两个返回值，第一个`retVal`（得到的阈值值（在后面一个方法中会用到）），第二个就是阈值化后的图像。 
 
 Applies a fixed-level threshold to each array element.
 
-- **` cv2.threshold(src, thresh, maxval, type[, dst]) → retval, dst`**
+```python
+cv2.threshold(src, thresh, maxval, type[, dst]) → retval, dst
+```
 
 **Parameters:**
 
@@ -462,11 +480,13 @@ Applies a fixed-level threshold to each array element.
 - **maxval** – maximum value to use with the `THRESH_BINARY` and `THRESH_BINARY_INV` thresholding types.
 - **type** – thresholding type (see the details below).  
 
-The function applies fixed-level thresholding to a single-channel array. The function is typically used to get a bi-level (binary) image out of a grayscale image ( [`compare()`](https://docs.opencv.org/3.0-beta/modules/core/doc/operations_on_arrays.html#void compare(InputArray src1, InputArray src2, OutputArray dst, int cmpop)) could be also used for this purpose) or **for removing a noise**, that is, **filtering out pixels with too small or too large values.** There are several types of thresholding supported by the function. They are determined by `type` :
+The function applies fixed-level thresholding to a single-channel array. The function is typically used to get a bi-level (binary) image out of a grayscale image ( `compare()` could be also used for this purpose) or **for removing a noise**, that is, **filtering out pixels with too small or too large values.** There are several types of thresholding supported by the function. They are determined by `type` :
 
 > - **THRESH_BINARY**
 >
->   > ![\texttt{dst} (x,y) =  \fork{\texttt{maxval}}{if $\texttt{src}(x,y) > \texttt{thresh}$}{0}{otherwise}](https://docs.opencv.org/3.0-beta/_images/math/21dfc802899546a3a9a51794d241330e6377f032.png)
+>   
+>
+>   > ![](https://docs.opencv.org/3.0-beta/_images/math/21dfc802899546a3a9a51794d241330e6377f032.png)
 >
 > - **THRESH_BINARY_INV**
 >
@@ -515,56 +535,53 @@ plt.show()
 
 ###  （二）自适应阈值：
 
-前面看到简单阈值是一种全局性的阈值，只需要规定一个阈值值，整个图像都和这个阈值比较。而自适应阈值可以看成一种局部性的阈值，**`通过规定一个区域大小，比较这个点与区域大小里面像素点的平均值（或者其他特征）的大小关系来确定这个像素点是属于黑或者白`**（如果是二值情况）。使用的函数为：**`cv2.adaptiveThreshold（）`** 
+前面看到简单阈值是一种全局性的阈值，只需要规定一个阈值值，整个图像都和这个阈值比较。而自适应阈值可以看成一种局部性的阈值，通过规定一个区域大小，比较这个点与区域大小里面像素点的平均值（或者其他特征）的大小关系来确定这个像素点是属于黑或者白（如果是二值情况）。使用的函数为：
+
+```python
+cv2.adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, C[, dst]) → dst
+```
+
 该函数需要填6个参数：
 
 - 第一个原始图像
-
 - 第二个像素值上限
-
-- 第三个自适应方法**`Adaptive Method`**: 
-  — **`cv2.ADAPTIVE_THRESH_MEAN_C`** ：领域内均值 
-  —**`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`** ：领域内像素点加权和，权重为一个高斯窗口
-
-- 第四个值的赋值方法：只有**`cv2.THRESH_BINARY`** 和**`cv2.THRESH_BINARY_INV`**
-
-- 第五个Block size:规定领域大小（一个正方形的领域）
-
-- 第六个常数C，**`阈值等于均值或者加权值减去这个常数`**（为0相当于阈值 就是求得领域内均值或者加权值） 
+- 第三个自适应方法Adaptive Method: 
+  - `cv2.ADAPTIVE_THRESH_MEAN_C` ：领域内均值 
+  - `cv2.ADAPTIVE_THRESH_GAUSSIAN_C` ：领域内像素点加权和，权重为一个高斯窗口
+- 第四个值的赋值方法：只有`cv2.THRESH_BINARY` 和`cv2.THRESH_BINARY_INV`
+- 第五个*Blocksize*：规定领域大小（一个正方形的领域）
+- 第六个常数*C*，阈值等于均值或者加权值减去这个常数（为0相当于阈值 就是求得领域内均值或者加权值） 
   这种方法理论上得到的效果更好，相当于在动态自适应的调整属于自己像素点的阈值，而不是整幅图像都用一个阈值。
 
-  ## adaptiveThreshold
+Applies an adaptive threshold to an array.
 
-  Applies an adaptive threshold to an array.
+- **src** – **Source 8-bit single-channel image.**
 
-   **`cv2.adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, C[, dst]) → dst`** **Parameters:**  
+- **dst** – Destination image of the same size and the same type as `src` .  
 
-  **src** – Source 8-bit single-channel image.
+- **maxValue** – Non-zero value assigned to the pixels for which the condition is satisfied. See the details below.  
 
-  **dst** – Destination image of the same size and the same type as `src` .  
+- **adaptiveMethod** – Adaptive thresholding algorithm to use, `ADAPTIVE_THRESH_MEAN_C` or`ADAPTIVE_THRESH_GAUSSIAN_C` . See the details below.  
 
-  **maxValue** – Non-zero value assigned to the pixels for which the condition is satisfied. See the details below.  
+- **thresholdType** – Thresholding type that must be either `THRESH_BINARY` or `THRESH_BINARY_INV`
+-  **blockSize** – Size of a pixel neighborhood that is used to calculate a threshold value for the pixel: 3, 5, 7, and so on.  
 
-  **adaptiveMethod** – Adaptive thresholding algorithm to use, `ADAPTIVE_THRESH_MEAN_C` or`ADAPTIVE_THRESH_GAUSSIAN_C` . See the details below.  
+- **C** – Constant subtracted from the mean or weighted mean (see the details below). Normally, it is positive but may be zero or negative as well. 
 
-  **thresholdType** – Thresholding type that must be either `THRESH_BINARY` or `THRESH_BINARY_INV` **blockSize** – Size of a pixel neighborhood that is used to calculate a threshold value for the pixel: 3, 5, 7, and so on.  
+The function transforms a *grayscale* image to a binary image according to the formulae:
 
-  **C** – **`Constant subtracted from the mean or weighted mean`** (see the details below). Normally, it is positive but may be zero or negative as well. 
+- **THRESH_BINARY**
 
-  **The function transforms a `grayscale image to a binary image` according to the formulae:**
+![dst(x,y) =  \fork{\texttt{maxValue}}{if $src(x,y) > T(x,y)$}{0}{otherwise}](https://docs.opencv.org/3.0-beta/_images/math/7df8e198374f12e5e28ff32b34d49ecb2fbdddb4.png)
 
-  > - **THRESH_BINARY**
-  >
-  >   > ![dst(x,y) =  \fork{\texttt{maxValue}}{if $src(x,y) > T(x,y)$}{0}{otherwise}](https://docs.opencv.org/3.0-beta/_images/math/7df8e198374f12e5e28ff32b34d49ecb2fbdddb4.png)
-  >
-  > - **THRESH_BINARY_INV**
-  >
-  >   > ![dst(x,y) =  \fork{0}{if $src(x,y) > T(x,y)$}{\texttt{maxValue}}{otherwise}](https://docs.opencv.org/3.0-beta/_images/math/59b5b25f1acebef583c96c77c49354b22f871560.png)
+- **THRESH_BINARY_INV**
 
-  where ![T(x,y)](https://docs.opencv.org/3.0-beta/_images/math/5e11673cd01013b82529c8316a1505243cea62ad.png) is a threshold calculated individually for each pixel.
+![dst(x,y) =  \fork{0}{if $src(x,y) > T(x,y)$}{\texttt{maxValue}}{otherwise}](https://docs.opencv.org/3.0-beta/_images/math/59b5b25f1acebef583c96c77c49354b22f871560.png)
 
-  - For the method `ADAPTIVE_THRESH_MEAN_C` , the threshold value ![T(x,y)](https://docs.opencv.org/3.0-beta/_images/math/5e11673cd01013b82529c8316a1505243cea62ad.png) is a mean of the ![\texttt{blockSize} \times \texttt{blockSize}](https://docs.opencv.org/3.0-beta/_images/math/91b988f5a3acb7025e903a2b1bc6b7558e5970dd.png) neighborhood of ![(x, y)](https://docs.opencv.org/3.0-beta/_images/math/dee21a914bf9088bc0dfbd38a96c1f859c412ec7.png) minus `C` .
-  - For the method `ADAPTIVE_THRESH_GAUSSIAN_C` , the threshold value ![T(x, y)](https://docs.opencv.org/3.0-beta/_images/math/0f2558a6357e54ae9a3cd1799dd33ffc088bf25d.png) is a weighted sum (cross-correlation with a Gaussian window) of the ![\texttt{blockSize} \times \texttt{blockSize}](https://docs.opencv.org/3.0-beta/_images/math/91b988f5a3acb7025e903a2b1bc6b7558e5970dd.png) neighborhood of ![(x, y)](https://docs.opencv.org/3.0-beta/_images/math/dee21a914bf9088bc0dfbd38a96c1f859c412ec7.png) minus `C` . The default sigma (standard deviation) is used for the specified `blockSize` . See [`getGaussianKernel()`](https://docs.opencv.org/3.0-beta/modules/imgproc/doc/filtering.html#Mat getGaussianKernel(int ksize, double sigma, int ktype)) .
+where $T(x,y)$ is a threshold calculated individually for each pixel.
+
+- For the method `ADAPTIVE_THRESH_MEAN_C` , the threshold value $T(x,y)$ is a mean of the $\texttt{blockSize} \times \texttt{blockSize}$ neighborhood of $(x, y)$ minus `C` .
+- For the method `ADAPTIVE_THRESH_GAUSSIAN_C` , the threshold value $T(x, y)$ is a weighted sum (cross-correlation with a Gaussian window) of the $\texttt{blockSize} \times \texttt{blockSize}$ neighborhood of $(x, y)$ minus `C` . The default sigma (standard deviation) is used for the specified `blockSize` . See [`getGaussianKernel()`](https://docs.opencv.org/3.0-beta/modules/imgproc/doc/filtering.html#Mat getGaussianKernel(int ksize, double sigma, int ktype)) .
 
 一个实例如下：
 
