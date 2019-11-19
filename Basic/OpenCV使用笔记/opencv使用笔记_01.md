@@ -608,14 +608,14 @@ plt.show()
 
 ###  三）Otsu’s二值化
 
-我们前面说到，**`cv2.threshold`**函数是有两个返回值的，前面一直用的第二个返回值，也就是阈值处理后的图像，那么第一个返回值（得到图像的阈值）将会在这里用到。 
-前面对于阈值的处理上，我们选择的阈值都是127，那么实际情况下，怎么去选择这个127呢？有的图像可能阈值不是127得到的效果更好。那么这里我们需要算法自己去寻找到一个阈值，而**`Otsu’s`**就可以自己找到一个认为最好的阈值。并且**`Otsu’s`**非常适合于图像**`灰度直方图具有双峰`**的情况，他会在**双峰之间找到一个值作为阈值**，对于非双峰图像，可能并不是很好用。那么经过**`Otsu’s`**得到的那个阈值就是函数**`cv2.threshold`**的第一个参数了。因为**`Otsu’s`**方法会产生一个阈值，那么函数**`cv2.threshold`**的的第二个参数（设置阈值）就是0了，并且在cv2.threshold的方法参数中还得加上语句**`cv2.THRESH_OTSU`**。那么什么是**`双峰图像（只能是灰度图像才有`**），就是图像的灰度统计图中可以明显看出只有两个波峰，比如下面一个图的灰度直方图就可以是双峰图： 
+我们前面说到，`cv2.threshold`函数是有两个返回值的，前面一直用的第二个返回值，也就是阈值处理后的图像，那么第一个返回值（得到图像的阈值）将会在这里用到。 
+前面对于阈值的处理上，我们选择的阈值都是$127$，那么实际情况下，怎么去选择这个$127$呢？有的图像可能阈值不是$127$得到的效果更好。那么这里我们需要算法自己去寻找到一个阈值，而Otsu’s就可以自己找到一个认为最好的阈值。并且Otsu’s非常适合于图像灰度直方图具有双峰的情况，他会在双峰之间找到一个值作为阈值，对于非双峰图像，可能并不是很好用。那么经过Otsu’s得到的那个阈值就是函数`cv2.threshold`的第一个参数了。因为Otsu’s方法会产生一个阈值，那么函数`cv2.threshold`的第二个参数（设置阈值）就是$0$了，并且在`cv2.threshold`的方法参数中还得加上语句`cv2.THRESH_OTSU`。那么什么是双峰图像（只能是灰度图像才有），就是图像的灰度统计图中可以明显看出只有两个波峰，比如下面一个图的灰度直方图就可以是双峰图： 
 
-![这里写图片描述](http://img.blog.csdn.net/20150709090157285)
+<img src="graph/20150709090157285" alt="这里写图片描述" style="zoom:50%;" />
 
 
 
-好了现在对这个图进行**`Otsu’s`**阈值处理就非常的好，通过函数**`cv2.threshold`**会自动找到一个介于两波峰之间的阈值。一个实例如下：
+好了现在对这个图进行Otsu’s阈值处理就非常的好，通过函数`cv2.threshold`会自动找到一个介于两波峰之间的阈值。一个实例如下：
 
 ```python
 import cv2
@@ -639,18 +639,21 @@ print ret2 得到的结果为122。可以看出似乎两个结果并没有很明
 
 ## opencv使用笔记（五）（图像的平滑与滤波）
 
-对于图形的**`平滑`**与**`滤波`**，但从滤波角度来讲，一般主要的目的都是为了实现对**`图像噪声的消除`**，**`增强图像`**的效果。 
-首先介绍**二维卷积运算，图像的滤波可以看成是滤波模板与原始图像对应部分的的卷积运算**。关于卷积运算，找到几篇相关的博客：
+对于图形的平滑与滤波，但从滤波角度来讲，一般主要的目的都是为了实现对图像噪声的消除，增强图像的效果。 
+首先介绍二维卷积运算，图像的滤波可以看成是滤波模板与原始图像对应部分的的卷积运算。关于卷积运算，找到几篇相关的博客：
 
-**图像处理：基础(模板、卷积运算)** 
-**图像处理-模板、卷积的整理**
+[图像处理：基础(模板、卷积运算)](http://blog.csdn.net/xiaoxin_ling/article/details/3587987)
+[图像处理-模板、卷积的整理](http://blog.csdn.net/lanbing510/article/details/7425952)
 
-对于2D图像可以进行**`低通或者高通滤波操作`**，**`低通滤波（LPF）`**有利于**去噪**，**模糊图像**，**`高通滤波（HPF）`**有利于找到**图像边界**。
+对于2D图像可以进行低通或者高通滤波操作
+
+- 低通滤波（`LPF`）有利于去噪，模糊图像
+- 高通滤波（`HPF`）有利于找到图像边界。
 
 ### （一）统一的2D滤波器cv2.filter2D
 
-Opencv提供的一个通用的2D滤波函数为**`cv2.filter2D()`**，滤波函数的使用需要一个**核模板**，对图像的滤波操作过程为：**将和模板放在图像的一个像素A上，求与之对应的图像上的每个像素点的和**，核不同，得到的结果不同，而滤波的使用核心也是对于这个核模板的使用，需要注意的是，**该滤波函数是单通道运算的，也就是说对于彩色图像的滤波，需要将`彩色图像的各个通道提取出来`，对各个通道分别滤波才行。** 
-这里说一个与matlab相似的情况，matlab中也有一个类似的滤波函数**`imfilter,`**对于滤波函数的应用其实不只在于滤波，对于许多图像的整体处理上，其实都可以用滤波函数来组合实现，得到更快的效果，相关的介绍间下面这个博客：
+Opencv提供的一个通用的2D滤波函数为`cv2.filter2D()`，滤波函数的使用需要一个核模板，对图像的滤波操作过程为：将和模板放在图像的一个像素$A$上，求与之对应的图像上的每个像素点的和，核不同，得到的结果不同，而滤波的使用核心也是对于这个核模板的使用，需要注意的是，该滤波函数是单通道运算的，也就是说对于彩色图像的滤波，需要将彩色图像的各个通道提取出来，对各个通道分别滤波才行。 
+这里说一个与matlab相似的情况，matlab中也有一个类似的滤波函数`imfilter`，对于滤波函数的应用其实不只在于滤波，对于许多图像的整体处理上，其实都可以用滤波函数来组合实现，得到更快的效果，相关的介绍间下面这个博客：
 
 **[图像滤波函数imfilter函数的应用及其扩展]()**
 
@@ -658,36 +661,37 @@ Opencv提供的一个通用的2D滤波函数为**`cv2.filter2D()`**，滤波函�
 
 Convolves an image with the kernel.
 
-**` cv2.filter2D(src, ddepth, kernel[, dst[, anchor[, delta[, borderType]]]]) → dst`**
+```python
+cv2.filter2D(src, ddepth, kernel[, dst[, anchor[, delta[, borderType]]]]) → dst
+```
 
 Parameters:  
 
 - **src** – input image.  
+
 - **dst** – output image of the same size and the same number of channels as `src`.  
+
 - **ddepth** –desired depth of the destination image; if it is negative, it will be the same as `src.depth()`; the following combinations of `src.depth()` and `ddepth` are supported:
 
-> > `src.depth() = CV_8U, ddepth= -1/CV_16S/CV_32F/CV_64F`
+  - `src.depth() = CV_8U, ddepth= -1/CV_16S/CV_32F/CV_64F`
+  - ``src.depth()= CV_16U/CV_16S, ddepth = -1/CV_32F/CV_64F`
+  - `src.depth() = CV_32F, ddepth = -1/CV_32F/CV_64F`
+  - `src.depth() = CV_64F, ddepth= -1/CV_64F`
 
-> > `src.depth()= CV_16U/CV_16S, ddepth = -1/CV_32F/CV_64F`
+  when `ddepth=-1`, the output image will have the same depth as the source. 
 
-> > `src.depth() = CV_32F, ddepth = -1/CV_32F/CV_64F`
-
-> > `src.depth() = CV_64F, ddepth= -1/CV_64F`
-
-when **`ddepth=-1`**, t**he output image will have the same depth as the source**. 
-
-- **kernel** – convolution kernel (or rather a correlation kernel), a single-channel floating point matrix; if you want to apply different kernels to different channels, **split the image into separate color planes using** [`split()`](https://docs.opencv.org/3.0-beta/modules/core/doc/operations_on_arrays.html#void split(const Mat& src, Mat* mvbegin)) and process them individually. 
-- **anchor** – anchor of the kernel that indicates the relative position of a filtered point within the kernel; the anchor should lie within the kernel; **`default value (-1,-1)`** means that the anchor is at the **`kernel center`**.
+- **kernel** – convolution kernel (or rather a correlation kernel), a single-channel floating point matrix; if you want to apply different kernels to different channels, split the image into separate color planes using `split()` and process them individually. 
+- **anchor** – anchor of the kernel that indicates the relative position of a filtered point within the kernel; the anchor should lie within the kernel; default value (-1,-1) means that the anchor is at the kernel center.
 - **delta** – optional value added to the filtered pixels before storing them in `dst`.
 - **borderType** – pixel extrapolation method (see `borderInterpolate` for details). 
 
 The function applies an arbitrary linear filter to an image. In-place operation is supported. When the aperture is partially outside the image, the function interpolates outlier pixel values according to the specified border mode.
 
 The function does actually compute correlation, not the convolution:
-
-![\texttt{dst} (x,y) =  \sum _{ \stackrel{0\leq x' < \texttt{kernel.cols},}{0\leq y' < \texttt{kernel.rows}} }  \texttt{kernel} (x',y')* \texttt{src} (x+x'- \texttt{anchor.x} ,y+y'- \texttt{anchor.y} )](https://docs.opencv.org/3.0-beta/_images/math/930d8a4a72259ace7a4966d4bc1b653eec1b7ce8.png)
-
-That is, the kernel is not mirrored around the anchor point. If you need a real convolution, flip the kernel using[`flip()`](https://docs.opencv.org/3.0-beta/modules/core/doc/operations_on_arrays.html#void flip(InputArray src, OutputArray dst, int flipCode)) and set the new anchor to `(kernel.cols - anchor.x - 1, kernel.rows - anchor.y - 1)` .
+$$
+\texttt{dst} (x,y) =  \sum _{ \stackrel{0\leq x' < \texttt{kernel.cols},}{0\leq y' < \texttt{kernel.rows}} }  \texttt{kernel} (x',y')* \texttt{src} (x+x'- \texttt{anchor.x} ,y+y'- \texttt{anchor.y} )
+$$
+That is, the kernel is not mirrored around the anchor point. If you need a real convolution, flip the kernel using `flip()` and set the new anchor to `(kernel.cols - anchor.x - 1, kernel.rows - anchor.y - 1)` .
 
 The function uses the DFT-based algorithm in case of sufficiently large kernels (~``11 x 11`` or larger) and the direct algorithm for small kernels.
 
@@ -708,10 +712,9 @@ plt.subplot(1,2,1),plt.imshow(img1,'gray')#默认彩色，另一种彩色bgr
 plt.subplot(1,2,2),plt.imshow(dst,'gray')1234567891011121314
 ```
 
-![这里写图片描述](http://img.blog.csdn.net/20150710112550116) 
-下面介绍的几种滤波部分可能是将函数cv2.filter2D()具体化，重新规定一个名字而已，贴一个好的博客参考：
+![这里写图片描述](http://img.blog.csdn.net/20150710112550116) 下面介绍的几种滤波部分可能是将函数cv2.filter2D()具体化，重新规定一个名字而已，贴一个好的博客参考：
 
-**[图像平滑处理（归一化块滤波、高斯滤波、中值滤波、双边滤波）]()**
+[图像平滑处理（归一化块滤波、高斯滤波、中值滤波、双边滤波）](http://blog.csdn.net/xw20084898/article/details/21822565)
 
 ## （二）均值滤波
 
