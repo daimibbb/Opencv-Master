@@ -23,7 +23,7 @@ retval	=	cv.imread(	filename[, flags]	)
 
 ```python
 import cv2 
-img = cv2.imread('flower.jpg') 
+img = cv2.imread('data/lena.jpg') 
 ```
 
 
@@ -212,18 +212,23 @@ img = cv2.ellipse(img, box, color, thickness=1, lineType=cv2.LINE_8)
 - *endAngle*    Ending angle of the elliptic arc in degrees.
 
 ```python
-mport cv2
+import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-img = np.zeros((512,512,3),np.uint8)#生成一个空彩色图像
-cv2.ellipse(img,(256,256),(150,100),0,0,180,250,-1)
 
+img = np.zeros( (512, 512, 3), np.uint8) + 255
 # 注意最后一个参数-1，表示对图像进行填充，默认是不填充的，如果去掉，只有椭圆轮廓了
+cv2.ellipse(img=img, center=(256, 256), axes=(150, 100), angle=0,
+            startAngle=0, endAngle=180, color=250, thickness=-1)
 
-plt.imshow(img,'brg')
+b, g, r = cv2.split(img)
+img = cv2.merge([r, g, b])
+plt.imshow(img, 'brg')
+plt.xticks([]), plt.yticks([])
+plt.show()
 ```
 
-![ellips](E:\machine_learning\opencv\ellips.jpg)
+ ![img](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAO4AAADuCAYAAAA+7jsiAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDMuMC4zLCBodHRwOi8vbWF0cGxvdGxpYi5vcmcvnQurowAABApJREFUeJzt3UtuE0EUQNE2gh2EMV5E9r+CLCKMyQ4YNIMIAYLEbuKOfavOGfeg5Krbr/KRfFjXdQFaPlx7AcB2woUg4UKQcCFIuBAkXAgSLgQJF4KEC0Eftzx8d3e3Ho/HnZYCPD4+Lk9PT4dTz20K93g8Lg8PD/+/KuBV9/f3Zz3nqgxBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChaCP117A3g6H79deAle0rp+uvYRdmLgQNHy4o75xmdvw4cKIhAtBwoUg4TKskX+/IVwIEi4ETRHuyFcm5jRFuDAa4TKk0W9Z04Q7+kbyywx7PU24MJKpwp3hTTy7WfZ4qnBhFNOFO8sbeUYz7e104S7LXBvMmKYMd1nEO5rZ9nPacBnHbNEuy+Thzrjho5l1D6cOd1nm3Xjapg+XrplfusJdng/AzIegaPb9Eu5vZj8MFfZJuMSI9tnw32Sw1c+D4RsQbotg/2TivsBBuR324m/CfYUDw61yVT7B1fl6vDhfZuKeySF6Xz7v1wl3A4dpf/6mfh5X5Y1cnfch1m1M3P9kMlyOz3E7E/eNfj90pvD5xPo2Ju4FOYynualchol7YX4G/jexXpZwd+IK/Uyw+xDuO5htCot1f8J9RyNPYbG+L+FeyUsHvRC0SK9PuDfmVqeyWG+LcG/YqVguGbYwW4QbJrZ5+QcMCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAg6rOt6/sOHw7dlWb7utxyY3pd1XT+femhTuMBtcFWGIOFCkHAhSLgQJFwIEi4ECReChAtBwoWgH8mrouUWX4eqAAAAAElFTkSuQmCC) 
 
 ## opencv使用笔记（三）（图像的几何变换）
 
