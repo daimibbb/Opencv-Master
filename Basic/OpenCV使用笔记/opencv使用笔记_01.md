@@ -241,31 +241,35 @@ plt.show()
 
 ### （一）图像的平移
 
-下面介绍的图像操作假设你已经知道了为什么需要用矩阵构造才能实现了（上面那个博客有介绍为什么）。那么关于偏移很简单，图像的平移，沿着x方向tx距离，y方向ty距离，那么需要构造移动矩阵： 
+下面介绍的图像操作假设你已经知道了为什么需要用矩阵构造才能实现了（上面那个博客有介绍为什么）。那么关于偏移很简单，图像的平移，沿着$x$方向$t_x$距离，$y$方向$t_y$距离，那么需要构造移动矩阵： 
 $$
-M = \begin{bmatrix}1 & 0 & t_x\\0& 1 & t_y \end{bmatrix}
+M = \begin{bmatrix}
+1 & 0 & t_x\\
+0& 1 & t_y 
+\end{bmatrix}
 $$
-通过numpy来产生这个矩阵，并将其赋值给仿射函数**`cv2.warpAffine()`.** 
+通过`numpy`来产生这个矩阵，并将其赋值给仿射函数`cv2.warpAffine()`. 
 
-仿射函数**`cv2.warpAffine()`**接受三个参数，需要变换的原始图像，移动矩阵M 以及变换的图像大小（这个大小如果不和原始图像大小相同，那么函数会自动通过插值来调整像素间的关系）。 
+仿射函数`cv2.warpAffine()`接受三个参数，需要变换的原始图像，移动矩阵$M$ 以及变换的图像大小（这个大小如果不和原始图像大小相同，那么函数会自动通过插值来调整像素间的关系）。 
 
-**`cv2.warpAffine(src, M, dsize[, dst[, flags[, borderMode[, borderValue]]]]) → dst`**
+```python
+dst = cv2.warpAffine(src, M, dsize[, dst[, flags[, borderMode[, borderValue]]]])
+```
 
+**Parameters**
 
+- *src*	input image.
+- *dst*	output image that has the size dsize and the same type as src .
+- *M*	   $2×3$ transformation matrix.
+- *dsize*	size of the output image.
+- *flags*	combination of interpolation methods (see `InterpolationFlags`) and the optional flag `WARP_INVERSE_MAP`that means that M is the inverse transformation ( *dst*→*src* ).
+- *borderMode*	pixel extrapolation method (see `BorderTypes`); when `borderMode=BORDER_TRANSPARENT`, it means that the pixels in the destination image corresponding to the "outliers" in the source image are not modified by the function.
+  borderValue	value used in case of a constant border; by default, it is 0.
 
-
-- **src** – input image.
-- **dst** – output image that has the size `dsize` and the same type as `src` .
-- **M** – ![2\times 3](https://docs.opencv.org/3.0-beta/_images/math/f335f976f482cd08e9c6c198204b18c1fc769882.png) transformation matrix.
-- **dsize** – size of the output image.
-- **flags** – combination of interpolation methods (see [`resize()`](https://docs.opencv.org/3.0-beta/modules/imgproc/doc/geometric_transformations.html?highlight=cv2.war#void resize(InputArray src, OutputArray dst, Size dsize, double fx, double fy, int interpolation)) ) and the optional flag `WARP_INVERSE_MAP` that means that `M` is the inverse transformation ( ![\texttt{dst}\rightarrow\texttt{src}](https://docs.opencv.org/3.0-beta/_images/math/79358c8b893d7d0db75b629175a7eab3db5f192b.png) ).
-- **borderMode** – pixel extrapolation method (see [`borderInterpolate()`](https://docs.opencv.org/3.0-beta/modules/core/doc/operations_on_arrays.html#int borderInterpolate(int p, int len, int borderType))); when`borderMode=BORDER_TRANSPARENT` , it means that the pixels in the destination image corresponding to the “outliers” in the source image are not modified by the function.
-- **borderValue** – value used in case of a constant border; by default, it is 0.
-
-The function `warpAffine` transforms the source image using the specified matrix:
-
-![\texttt{dst} (x,y) =  \texttt{src} ( \texttt{M} _{11} x +  \texttt{M} _{12} y +  \texttt{M} _{13}, \texttt{M} _{21} x +  \texttt{M} _{22} y +  \texttt{M} _{23})](https://docs.opencv.org/3.0-beta/_images/math/189dfa6dbab9ff81eaeaa453b1a1e2313dcd3a26.png)
-
+The function **warpAffine transforms** the source image using the specified matrix:
+$$
+\texttt{dst} (x,y) =  \texttt{src} ( \texttt{M} _{11} x +  \texttt{M} _{12} y +  \texttt{M} _{13}, \texttt{M} _{21} x +  \texttt{M} _{22} y +  \texttt{M} _{23})
+$$
 一个例子如下：
 
 ```python
