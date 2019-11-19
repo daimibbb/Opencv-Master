@@ -1,4 +1,4 @@
-# OpenCV使用笔记
+OpenCV使用笔记
 
 [TOC]
 
@@ -132,7 +132,7 @@ plt.show()
 函数：
 
 ```python
-cv2.rectangle(img, pt1, pt2, color[, thickness[, lineType[, shift]]])
+img	= cv.rectangle(img, pt1, pt2, color, thickness=1, lineType=cv2.LINE_8, shift=0)
 ```
 
 需要确定的就是矩形的两个点（左上角与右下角），颜色，线的类型（不设置就默认）。 
@@ -142,63 +142,74 @@ cv2.rectangle(img, pt1, pt2, color[, thickness[, lineType[, shift]]])
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-img = np.zeros((512,512,3),np.uint8)+255#生成一个空彩色图像
-cv2.rectangle(img,(20,20),(411,411),(55,255,155),5)
-plt.imshow(img,'brg')
+
+img = np.zeros( (512, 512, 3), np.uint8) + 255
+height, width, _ = img.shape
+offset = 40
+cv2.rectangle(img, (offset, offset), (height-offset, width-offset), 
+              (55, 255, 255), 5)
+
+b, g, r = cv2.split(img)
+img = cv2.merge([r, g, b])
+plt.imshow(img, 'brg')
+plt.xticks([]), plt.yticks([])
+plt.show()
 ```
 
-![rectangle](E:\machine_learning\opencv\rectangle.jpg)
+ ![img](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAO4AAADuCAYAAAA+7jsiAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDMuMC4zLCBodHRwOi8vbWF0cGxvdGxpYi5vcmcvnQurowAAA0hJREFUeJzt2zFOw0AQQFEbcYRQ40Ok4P4VRQ4RanKHpaUCDNjmi/fqkXYj5WsnReYxxgS03B19AWA94UKQcCFIuBAkXAgSLgQJF4KEC0HChaD7NcOn02ksy7LRVYDr9Trdbrf5s7lV4S7LMl0ul+/fCvjQ+Xz+0pxVGYKEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhaNW/g37uad/j4BDPm5/gxYVft/0DJVwI2nlVfm/7dQL2td9PQS8uBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIEi4ECReChAtBwoWg++OOfjruaIjz4sKve978hJ3D3f4DwbH2+Y4fsCqLF37KqgxBwoUg4UKQcCFIuBAkXAgSLgQJF4KEC0HChSDhQpBwIUi4ECRcCJrHGF8fnufXaZpetrsO/HuPY4yHz4ZWhQv8DVZlCBIuBAkXgoQLQcKFIOFCkHAhSLgQJFwIegMEpx/N+dzG/gAAAABJRU5ErkJggg==) 
 
 ### 三）绘制圆形
 
 绘制圆形也很简单，只需要确定圆心与半径，
 
-函数：**` cv2.circle(img, center, radius, color[, thickness[, lineType[, shift]]]) → img`** 
+函数：
+
+```python
+img = cv2.circle(img, center, radius, color, thickness=1, lineType=cv2.LINE_8, shift=0)
+```
+
 比如：
 
 ```python
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-img = np.zeros((512,512,3),np.uint8)#生成一个空彩色图像
-cv2.circle(img,(200,200),50,(55,255,155),1)#修改最后一个参数
-plt.imshow(img,'brg')
+
+img = np.zeros( (512, 512, 3), np.uint8) + 255
+height, width, _ = img.shape
+offset = 40
+cv2.circle(img, (height//2, width//2), (height+width)//4-offset, (55, 255, 255), 5)
+
+b, g, r = cv2.split(img)
+img = cv2.merge([r, g, b])
+plt.imshow(img, 'brg')
+plt.xticks([]), plt.yticks([])
+plt.show()
 ```
 
-![circle](E:\machine_learning\opencv\circle.jpg)
+ ![img](data:image/png;base64,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) 
 
-```python
-import cv2
-import numpy as np
-from matplotlib import pyplot as plt
-img = np.zeros((512,512,3),np.uint8)#生成一个空彩色图像
-cv2.circle(img,(200,200),50,(55,255,155),8)#修改最后一个参数
-plt.imshow(img,'brg')123456
-```
+---
 
 ### （四）绘制椭圆
 
 椭圆比较复杂，涉及到长轴短轴，椭圆圆心
 
-- **` ``cv2.ellipse(img, center, axes, angle, startAngle, endAngle, color[, thickness[, lineType[, shift]]]) → img`**
+```python
+img = cv2.ellipse(img, center, axes, angle, startAngle, 
+                  endAngle, color, thickness=1, lineType=cv2.LINE_8, shift=0)
 
+img = cv2.ellipse(img, box, color, thickness=1, lineType=cv2.LINE_8)
+```
 
-- **` ``cv2.``ellipse`(img, box, color[, thickness[, lineType]]) → img  
+**Parameters**
 
-  | Parameters: | **img** – Image                          |
-  | ----------- | ---------------------------------------- |
-  |             | **center** – Center of the ellipse.      |
-  |             | **axes** – Half of the size of the ellipse main axes. |
-  |             | **angle** – Ellipse rotation angle in degrees. |
-  |             | **startAngle** – Starting angle of the elliptic arc in degrees. |
-  |             | **endAngle** – Ending angle of the elliptic arc in degrees. |
-  |             | **box** – Alternative ellipse representation via [`RotatedRect`](https://docs.opencv.org/3.0-beta/modules/core/doc/basic_structures.html#RotatedRect) or `CvBox2D`. This means that the function draws an ellipse inscribed in the rotated rectangle. |
-  |             | **color** – Ellipse color.               |
-  |             | **thickness** – Thickness of the ellipse arc outline, if positive. Otherwise, this indicates that a filled ellipse sector is to be drawn. |
-  |             | **lineType** – Type of the ellipse boundary. See the [`line()`](https://docs.opencv.org/3.0-beta/modules/imgproc/doc/drawing_functions.html?highlight=cv2.rectangle#void line(InputOutputArray img, Point pt1, Point pt2, const Scalar& color, int thickness, int lineType, int shift)) description. |
-  |             | **shift** – Number of fractional bits in the coordinates of the center and values of axes. |
-
-![../../../_images/ellipse.png](https://docs.opencv.org/3.0-beta/_images/ellipse.png)
+- *img*	          Image.
+- *center*	      Center of the ellipse.
+- *axes*	         Half of the size of the ellipse main axes.
+- *angle*	       Ellipse rotation angle in degrees.
+- *startAngle*  Starting angle of the elliptic arc in degrees.
+- *endAngle*    Ending angle of the elliptic arc in degrees.
 
 ```python
 mport cv2
