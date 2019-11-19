@@ -1,8 +1,6 @@
----
-typora-root-url: 图片库
-typora-copy-images-to: 图片库
-style: ocean
----
+# OpenCV使用笔记
+
+[TOC]
 
 ## opencv使用笔记（一）（图像简单读取、显示与储存）
 
@@ -97,7 +95,7 @@ plt.show() #显示出来
 
   ![line](E:\machine_learning\opencv\line.jpg)
 
-  ​
+  
 
 ```python
 import cv2
