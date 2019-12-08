@@ -1286,3 +1286,6 @@ I've normalized the 'gray' spelling to 'grey' since that was more popular among 
 <td><center><div class="square" style="background:#56ae57">&nbsp;</div>dark pastel green<br><span style="font-size: 12px">(#56ae57)</span><br>&nbsp;</center></td>
 <td><center><div class="square" style="background:#acc2d9">&nbsp;</div>cloudy blue<br><span style="font-size: 12px">(#acc2d9)</span><br>&nbsp;</center></td>
 </tr></tbody></table>
+
+
+
